@@ -16,6 +16,7 @@ pymysql = "*"
 cryptography = "*"
 flask-httpauth = "*"
 werkzeug = "*"
+flask-jwt-extended = "*"
 
 [dev-packages]
 

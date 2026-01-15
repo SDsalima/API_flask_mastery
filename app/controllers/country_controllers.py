@@ -2,10 +2,11 @@ from app import app, db, auth
 from app.models.country import Country
 from app.schemas.country_schema import country_schema, countries_schema
 from flask import jsonify, request
+from flask_jwt_extended import  jwt_required
 
 
-@app.route('/countries', methods=['GET'])
-@auth.login_required()
+@app.get('/countries')
+@auth.verify_password
 def countries():
     country_list=Country.query.all()
     result= countries_schema.dump(country_list)
@@ -14,10 +15,9 @@ def countries():
 
 
 @app.route("/country_details/<int:country_id>", methods=['GET'])
-@auth.login_required()
+@jwt_required()
 def country_details(country_id):
     country=Country.query.filter_by(Country_ID=country_id).first()
-    
     if country:
         result= country_schema.dump(country)
         return jsonify(result)
@@ -25,41 +25,41 @@ def country_details(country_id):
 
 
 
-# post form data to the api
-@app.route('/add_country', methods=['POST'])
-@auth.login_required()
-def add_country():
-    country_name= request.form['country_name']
-    check_name=Country.query.filter_by(Country_name= country_name).first()
-    if check_name:
-        return jsonify("That country is already exist in the database!."), 409
-    capital= request.form['capital']
-    erea= request.form['erea']
-    new_country= Country(Country_name=country_name,Capital=capital, Erea=erea)
-    db.session.add(new_country)
-    db.session.commit()
-    return jsonify("Your country is added successfully!."),201
-
-
-# # post json form
-# @app.route("/add_country1", methods=['POST'])
+# # post form data to the api
+# @app.post('/add_country')
+# @auth.verify_password
 # def add_country():
-#     data= request.get_json()
-#     if not data:
-#         return jsonify("Invalid or messing data!."), 400
-#     country_name= data.get('Country_name')
-#     checked_name= Country.query.filter_by(Country_name= country_name).first()
-#     if checked_name:
-#         return jsonify("This country is already exists in the database!."), 409
-#     capital= data.get('Capital')
-#     erea=data.get('Erea')
-#     new_country= Country(Country_name=country_name, Capital=capital, Erea=erea)
+#     country_name= request.['country_name']
+#     check_name=Country.query.filter_by(Country_name= country_name).first()
+#     if check_name:
+#         return jsonify("That country is already exist in the database!."), 409
+#     capital= request.form['capital']
+#     erea= request.form['crea']
+#     new_country= Country(Country_name=country_name,Capital=capital, Erea=erea)
 #     db.session.add(new_country)
 #     db.session.commit()
-#     return jsonify("Your country is added successfully!."), 201
+#     return jsonify("Your country is added successfully!."),201
+
+
+# post json form
+@app.route("/add_country1", methods=['POST'])
+def add_country():
+    data= request.get_json()
+    if not data:
+        return jsonify("Invalid or messing data!."), 400
+    country_name= data.get('Country_name')
+    checked_name= Country.query.filter_by(Country_name= country_name).first()
+    if checked_name:
+        return jsonify("This country is already exists in the database!."), 409
+    capital= data.get('Capital')
+    erea=data.get('Erea')
+    new_country= Country(Country_name=country_name, Capital=capital, Erea=erea)
+    db.session.add(new_country)
+    db.session.commit()
+    return jsonify("Your country is added successfully!."), 201
 
 @app.route("/update_country/<int:country_id>", methods=['PATCH'])
-@auth.login_required()
+@auth.verify_password
 def update_country(country_id):
     data= request.get_json()
     country=Country.query.filter_by(Country_ID= country_id).first()

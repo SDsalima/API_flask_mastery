@@ -26,7 +26,7 @@ def db_seed():
     db.session.add(germany)
     test_user=User(fname="salima",
                   lname="Dergoul",
-                  email="test@test.com",
+                  email="test@gmail.com",
                   password="123456")
     
     db.session.add(test_user)
