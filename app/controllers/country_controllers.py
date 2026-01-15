@@ -1,10 +1,11 @@
-from app import app, db
+from app import app, db, auth
 from app.models.country import Country
 from app.schemas.country_schema import country_schema, countries_schema
 from flask import jsonify, request
 
 
 @app.route('/countries', methods=['GET'])
+@auth.login_required()
 def countries():
     country_list=Country.query.all()
     result= countries_schema.dump(country_list)
@@ -13,6 +14,7 @@ def countries():
 
 
 @app.route("/country_details/<int:country_id>", methods=['GET'])
+@auth.login_required()
 def country_details(country_id):
     country=Country.query.filter_by(Country_ID=country_id).first()
     
@@ -25,6 +27,7 @@ def country_details(country_id):
 
 # post form data to the api
 @app.route('/add_country', methods=['POST'])
+@auth.login_required()
 def add_country():
     country_name= request.form['country_name']
     check_name=Country.query.filter_by(Country_name= country_name).first()
@@ -55,7 +58,8 @@ def add_country():
 #     db.session.commit()
 #     return jsonify("Your country is added successfully!."), 201
 
-@app.route("/countries/<int:country_id>", methods=['PATCH'])
+@app.route("/update_country/<int:country_id>", methods=['PATCH'])
+@auth.login_required()
 def update_country(country_id):
     data= request.get_json()
     country=Country.query.filter_by(Country_ID= country_id).first()
@@ -75,6 +79,7 @@ def update_country(country_id):
 
 
 @app.route("/remove_country/<int:country_id>", methods=['DELETE'])
+@auth.login_required()
 def remove_country(country_id):
     country=Country.query.filter_by(Country_ID=country_id).first()
     if not country:

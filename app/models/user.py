@@ -8,4 +8,6 @@ class User(db.Model):
    fname=Column(String(50), nullable= False)
    lname=Column(String(50), nullable= False)
    email= Column(String(120), nullable=False, unique=True)
-   password= Column(String(25), nullable=False)
+   password= Column(String(700), nullable=False)
+
+      
